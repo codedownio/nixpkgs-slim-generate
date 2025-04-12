@@ -12,7 +12,7 @@ echo "Generating for system: $SYSTEM"
 NIX_PATH="nixpkgs=$fullNixpkgs"
 export NIX_PATH
 
-STORE=$(mktemp -d)
+STORE=$(mktemp -d -p $(pwd) store.XXXXXXXXXX)
 
 cleanup() {
   echo "Cleaning up $STORE..."
@@ -23,6 +23,6 @@ trap cleanup EXIT
 
 nix-build -vv expr.nix --store "$STORE" --no-out-link --substituters https://cache.nixos.org > all_build_output.txt 2>&1
 
-grep -o -P "$fullNixpkgs/[^']*" all_build_output.txt | sort | uniq > "files/$SYSTEM.txt"
+grep -o "$fullNixpkgs/[^']*" all_build_output.txt | sort | uniq > "files/$SYSTEM.txt"
 
 rm all_build_output.txt
