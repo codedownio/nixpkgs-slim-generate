@@ -1,4 +1,6 @@
-with { inherit (import <nixpkgs> {}) fetchFromGitHub fetchgit symlinkJoin; };
+{ system ? builtins.currentSystem }:
+
+with { inherit (import <nixpkgs> { inherit system; }) fetchFromGitHub fetchgit symlinkJoin; };
 
 symlinkJoin {
   name = "slim-nixpkgs-path-closure";
