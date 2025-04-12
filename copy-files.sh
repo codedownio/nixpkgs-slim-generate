@@ -16,3 +16,8 @@ done
 
 rm -rf "$TARGET_DIR/.github"
 cp -r github "$TARGET_DIR/.github"
+
+mkdir -p "$TARGET_DIR/lib"
+chmod u+w "$TARGET_DIR/lib"
+rm -f "$TARGET_DIR/lib/customisation.nix"
+cp customisation.nix "$TARGET_DIR/lib/customisation.nix"
