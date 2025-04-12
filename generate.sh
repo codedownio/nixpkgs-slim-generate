@@ -24,19 +24,26 @@ function generate_for_system() {
 
   nix-build -vv expr.nix --store "$STORE" --no-out-link --argstr system "$SYSTEM" --substituters https://cache.nixos.org > all_build_output.txt 2>&1
 
-  grep -o "$fullNixpkgs/[^']*" all_build_output.txt | sed "s|$fullNixpkgs/||g" | sort | uniq > "files/$SYSTEM.txt"
+  grep -o "$fullNixpkgs/[^']*" all_build_output.txt | sed "s|$fullNixpkgs/||g" | env LC_ALL=C sort | uniq > "files/$SYSTEM.txt"
 
   rm all_build_output.txt
 }
 
-CURRENT_SYSTEM=$(nix eval --impure --expr "builtins.currentSystem" | tr -d '"')
+# It seems to work fine to generate for all systems on the same machine, as long
+# as we're not building anything OS-specific.
+generate_for_system aarch64-darwin
+generate_for_system x86_64-darwin
+generate_for_system aarch64-linux
+generate_for_system x86_64-linux
 
-if [[ $CURRENT_SYSTEM == *-linux ]]; then
-    generate_for_system x86_64-linux
-    generate_for_system aarch64-linux
-elif [[ $CURRENT_SYSTEM == *-darwin ]]; then
-    generate_for_system x86_64-darwin
-    generate_for_system aarch64-darwin
-else
-    echo "Unrecognized current system: $CURRENT_SYSTEM"
-fi
+# Old way: for generating different systems on different machines
+# CURRENT_SYSTEM=$(nix eval --impure --expr "builtins.currentSystem" | tr -d '"')
+# if [[ $CURRENT_SYSTEM == *-linux ]]; then
+#     generate_for_system x86_64-linux
+#     generate_for_system aarch64-linux
+# elif [[ $CURRENT_SYSTEM == *-darwin ]]; then
+#     generate_for_system x86_64-darwin
+#     generate_for_system aarch64-darwin
+# else
+#     echo "Unrecognized current system: $CURRENT_SYSTEM"
+# fi
