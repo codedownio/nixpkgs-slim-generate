@@ -4,3 +4,4 @@ pkgs/by-name/ap/apple-sdk/metadata/versions.json
 pkgs/by-name/ap/apple-sdk/metadata/disallowed-packages.json
 pkgs/by-name/ap/apple-sdk/metadata/apple-oss-lockfile.json
 pkgs/os-specific/darwin/apple-source-releases/versions.json
+pkgs/by-name/au/auto-patchelf/source/auto-patchelf.py
