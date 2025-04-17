@@ -1,6 +1,11 @@
 { system ? builtins.currentSystem }:
 
-with { inherit (import <nixpkgs> { inherit system; }) fetchFromGitHub fetchgit symlinkJoin; };
+with {
+  inherit (import <nixpkgs> { inherit system; })
+    fetchFromGitHub fetchgit symlinkJoin
+    nix-prefetch-git nix-prefetch-github
+  ;
+};
 
 symlinkJoin {
   name = "slim-nixpkgs-path-closure";
@@ -17,5 +22,9 @@ symlinkJoin {
       rev = "6d3fc36c541ae715d43db5c1355890f39024b26f";
       sha256 = "sha256-cRsIC0Ft5McBSia0rDdJIHy3muWqKn3rvjFx92DU2dY=";
     })
+
+    # Fetchers
+    nix-prefetch-git
+    nix-prefetch-github
   ];
 }
