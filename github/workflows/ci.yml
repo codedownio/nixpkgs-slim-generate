@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{matrix.file}}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -18,6 +18,12 @@ jobs:
         - macOS-13 # "Intel"
         - macOS-latest # arm64
 
+        file:
+        - fetchFromGitHub.nix
+        - fetchgit.nix
+        - nix-prefetch-git.nix
+        - nix-prefetch-github.nix
+
     steps:
     - uses: actions/checkout@v4
 
@@ -25,51 +31,6 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixos-unstable
 
-    - name: fetchFromGitHub checkout
+    - name: Build
       run : |
-        expr=$(cat <<-END
-        with { inherit (import ./. {}) fetchFromGitHub symlinkJoin; };
-
-        symlinkJoin {
-          name = "slim-nixpkgs-path-closure";
-          paths = [
-            (fetchFromGitHub {
-              owner = "NixOS";
-              repo = "nixpkgs";
-              rev = "6d3fc36c541ae715d43db5c1355890f39024b26f";
-              sha256 = "sha256-cRsIC0Ft5McBSia0rDdJIHy3muWqKn3rvjFx92DU2dY=";
-            })
-          ];
-        }
-        END
-        )
-
-        nix-build --show-trace -E "$expr"
-
-    - name: fetchgit checkout
-      run : |
-        expr=$(cat <<-END
-        with { inherit (import ./. {}) fetchgit symlinkJoin; };
-
-        symlinkJoin {
-          name = "slim-nixpkgs-path-closure";
-          paths = [
-            (fetchgit {
-              url = "https://github.com/NixOS/nixpkgs";
-              rev = "6d3fc36c541ae715d43db5c1355890f39024b26f";
-              sha256 = "sha256-cRsIC0Ft5McBSia0rDdJIHy3muWqKn3rvjFx92DU2dY=";
-            })
-          ];
-        }
-        END
-        )
-
-        nix-build --show-trace -E "$expr"
-
-    - name: nix-prefetch-git
-      run : |
-        nix-build --show-trace -E "(import ./. {}).nix-prefetch-git"
-
-    - name: nix-prefetch-github
-      run : |
-        nix-build --show-trace -E "(import ./. {}).nix-prefetch-github"
+        nix-build --show-trace ".github/exprs/${{matrix.file}}"
